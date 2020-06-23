@@ -33,12 +33,23 @@ const TodoTable = ({ openModal }) => {
     dispatch,
   ]);
 
-  const [listTodo, setListTodo] = useState([]);
+  const [tabTodo, setTabTodo] = useState([]);
+  const [sortedTodo, setSortedTodo] = useState([]);
+  const [groupedTodo, setGroupedTodo] = useState([]);
 
   const sortHeaderHandler = (heading) => {
-    console.log(heading, sortBy, order);
     sortHandler(heading);
   };
+
+  useEffect(() => {
+    if (tab === 0) {
+      setTabTodo([...todoList]);
+    } else if (tab === 1) {
+      setTabTodo(todoList.filter((todo) => !todo.completed));
+    } else if (tab === 2) {
+      setTabTodo(todoList.filter((todo) => todo.completed));
+    }
+  }, [tab, todoList]);
 
   useEffect(() => {
     const priority = (level) => {
@@ -50,7 +61,7 @@ const TodoTable = ({ openModal }) => {
       return lev;
     };
     if (sortBy === 'priority') {
-      let groupedList = listTodo.sort((a, b) => {
+      let sortedList = tabTodo.sort((a, b) => {
         let textA = a.priority.toUpperCase();
         let textB = b.priority.toUpperCase();
 
@@ -59,21 +70,30 @@ const TodoTable = ({ openModal }) => {
 
         return levelA < levelB ? -1 : levelA > levelB ? 1 : 0;
       });
-      setListTodo([...groupedList]);
+      setSortedTodo([...sortedList]);
+    } else if (sortBy === 'created') {
+      setSortedTodo([...tabTodo]);
+    } else {
+      let sortedList = tabTodo.sort((a, b) => {
+        let textA = a.priority.toUpperCase();
+        let textB = b.priority.toUpperCase();
+        return textA - textB;
+      });
+      let decList = sortedList.reverse();
+      setSortedTodo([...decList]);
     }
-    // eslint-disable-next-line
-  }, [sortBy, order]);
+  }, [tabTodo, sortBy, order]);
 
   useEffect(() => {
-    if (tab === 0) {
-      setListTodo([...todoList]);
-    } else if (tab === 1) {
-      setListTodo(todoList.filter((todo) => !todo.completed));
-    } else if (tab === 2) {
-      setListTodo(todoList.filter((todo) => todo.completed));
-    }
-    // eslint-disable-next-line
-  }, [tab, todoList]);
+    let groupObj = sortedTodo.reduce((r, todo) => {
+      r[todo[group]] = [...(r[todo[group]] || []), todo];
+      return r;
+    }, {});
+    setGroupedTodo({ ...groupObj });
+  }, [sortedTodo, group]);
+
+  let groupKeys = Object.keys(groupedTodo);
+  let groupValues = Object.values(groupedTodo);
 
   return (
     <>
@@ -133,14 +153,40 @@ const TodoTable = ({ openModal }) => {
                 ...transitionStyles[state],
               }}
             >
-              {listTodo.map((todo) => (
-                <TableItem
-                  todo={todo}
-                  key={todo.id}
-                  group={group}
-                  openModal={openModal}
-                />
-              ))}
+              {group === 'none' &&
+                sortedTodo.map((todo) => (
+                  <TableItem
+                    todo={todo}
+                    key={todo.id}
+                    group={group}
+                    openModal={openModal}
+                  />
+                ))}
+              {group !== 'none' &&
+                groupKeys.map((key, i) => (
+                  <div key={key}>
+                    <h4
+                      style={{
+                        textTransform: 'uppercase',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        padding: '1rem',
+                        margin: '0.5rem 0 0 0',
+                        fontWeight: 'bold',
+                      }}
+                    >
+                      {key}
+                    </h4>
+                    {groupValues[i].map((todo) => (
+                      <TableItem
+                        todo={todo}
+                        key={todo.id}
+                        group={group}
+                        openModal={openModal}
+                      />
+                    ))}
+                  </div>
+                ))}
             </div>
           )}
         </Transition>

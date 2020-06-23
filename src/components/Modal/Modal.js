@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { v4 as uuid } from 'uuid';
 import TextField from '@material-ui/core/TextField';
 import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import Button from '@material-ui/core/Button';
@@ -10,10 +11,29 @@ import moment from 'moment';
 import Modal from '../UIElements/Modal';
 import './Modal.scss';
 
-export default function TransitionsModal({ open, setOpen, data }) {
-  console.log(data);
+export default function TransitionsModal({
+  open,
+  setOpen,
+  data,
+  mode,
+  updateTodoHandler,
+  addTodoHandler,
+}) {
+  const [todoState, setTodoState] = useState({
+    id: uuid(),
+    summary: '',
+    description: '',
+    priority: 'none',
+    createdAt: moment(Date.now()).format('YYYY-MM-DD'),
+    dueDate: moment(Date.now()).format('YYYY-MM-DD'),
+    completed: false,
+  });
 
-  const [todoState, setTodoState] = useState({ ...data });
+  useEffect(() => {
+    if (mode === 'edit') {
+      setTodoState(data);
+    }
+  }, [data, mode]);
 
   const inputChangeHandler = (e) => {
     setTodoState({
@@ -25,19 +45,24 @@ export default function TransitionsModal({ open, setOpen, data }) {
   const timeChangeHandler = (e) => {
     setTodoState({
       ...todoState,
-      dueDate: parseInt(moment(e.target.value).format('x')),
+      dueDate: moment(e.target.value).format('YYYY-MM-DD'),
     });
   };
 
   const saveTodoHandler = () => {
+    if (mode === 'new') {
+      addTodoHandler(todoState);
+    } else if (mode === 'edit') {
+      updateTodoHandler(todoState);
+    }
     setOpen(false);
   };
 
   const priorityList = [
     { label: 'None', value: 'none' },
-    { label: 'High', value: 'high' },
-    { label: 'Medium', value: 'medium' },
     { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' },
   ];
 
   let footer = (
@@ -62,8 +87,6 @@ export default function TransitionsModal({ open, setOpen, data }) {
       </Button>
     </>
   );
-
-  console.log('[todoState]', todoState);
 
   return (
     <Modal
@@ -99,7 +122,6 @@ export default function TransitionsModal({ open, setOpen, data }) {
       <div className='dateSelect'>
         <div>
           <h4>Due Date</h4>
-          {console.log(moment(todoState.dueDate).format('YYYY-MM-DD'))}
           <form noValidate>
             <TextField
               id='date'

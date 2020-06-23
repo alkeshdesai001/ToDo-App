@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import Button from '@material-ui/core/Button';
 import EditIcon from '@material-ui/icons/Edit';
@@ -10,9 +10,13 @@ import { removeTodo, updateTodo } from '../../../store/Actions/TodoAction';
 import './TableItem.scss';
 
 const TodoTable = ({ todo, openModal }) => {
-  const [todoState, setTodoState] = useState({ ...todo });
+  const [todoState, setTodoState] = useState({});
 
-  const dispatch = useDispatch(todoState);
+  useEffect(() => {
+    setTodoState({ ...todo });
+  }, [todo]);
+
+  const dispatch = useDispatch();
 
   const updateTodoHandler = useCallback(
     (stateObj) => dispatch(updateTodo(stateObj)),
@@ -35,17 +39,40 @@ const TodoTable = ({ todo, openModal }) => {
 
   const [open, setOpen] = useState(false);
 
+  const priorityList = (value) => {
+    switch (value) {
+      case 'none':
+        return 'None';
+      case 'low':
+        return 'Low';
+      case 'medium':
+        return 'Medium';
+      case 'high':
+        return 'High';
+      default:
+        return 'None';
+    }
+  };
+
   return (
     <div className='table tableData'>
-      {open && <Modal open={open} setOpen={setOpen} data={todo} />}
+      {open && (
+        <Modal
+          open={open}
+          setOpen={setOpen}
+          data={todo}
+          mode='edit'
+          updateTodoHandler={updateTodoHandler}
+        />
+      )}
       <div className='summary' style={style}>
         {todoState.summary}
       </div>
       <div className='priority' style={style}>
-        {todoState.priority}
+        {priorityList(todoState.priority)}
       </div>
       <div className='created' style={style}>
-        {moment(todoState.dueDate).format('YYYY-MM-DD')}
+        {moment(todoState.created).format('YYYY-MM-DD')}
       </div>
       <div className='due' style={style}>
         {moment(todoState.dueDate).format('YYYY-MM-DD')}

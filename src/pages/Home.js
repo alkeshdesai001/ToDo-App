@@ -19,8 +19,8 @@ const Home = () => {
   const tabs = ['all', 'pending', 'completed'];
   const groupBy = [
     { label: 'None', value: 'none' },
-    { label: 'Created On', value: 'created' },
-    { label: 'Pending On', value: 'pending' },
+    { label: 'Created On', value: 'createdAt' },
+    { label: 'Pending On', value: 'dueDate' },
     { label: 'Priority', value: 'priority' },
   ];
 

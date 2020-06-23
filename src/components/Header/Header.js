@@ -8,7 +8,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Button from '@material-ui/core/Button';
 
 import Modal from '../Modal/Modal';
-import { setGroup } from '../../store/Actions/TodoAction';
+import { setGroup, addTodo } from '../../store/Actions/TodoAction';
 import './Header.scss';
 
 const Header = ({ groupBy }) => {
@@ -19,6 +19,11 @@ const Header = ({ groupBy }) => {
   const setGroupType = useCallback((group) => dispatch(setGroup(group)), [
     dispatch,
   ]);
+
+  const addTodoHandler = useCallback(
+    (stateObj) => dispatch(addTodo(stateObj)),
+    [dispatch]
+  );
 
   const [open, setOpen] = useState(false);
 
@@ -45,7 +50,15 @@ const Header = ({ groupBy }) => {
         variant='outlined'
         style={{ width: '70%' }}
       />
-      {open && <Modal open={open} setOpen={setOpen} data={null} />}
+      {open && (
+        <Modal
+          open={open}
+          setOpen={setOpen}
+          data={null}
+          mode='new'
+          addTodoHandler={addTodoHandler}
+        />
+      )}
       <Button
         variant='contained'
         size='small'
