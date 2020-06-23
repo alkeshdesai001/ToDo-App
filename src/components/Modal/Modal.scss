@@ -1,0 +1,30 @@
+.summaryInput {
+  input {
+    font: inherit;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.description {
+  textarea {
+    font: inherit;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+  }
+}
+
+.dateSelect {
+  display: grid;
+  grid-gap: 2rem;
+  grid-template-columns: 1fr 1fr;
+
+  input {
+    padding: 1rem;
+  }
+}
+
+.alignLeft {
+  display: flex;
+  justify-content: flex-end;
+}

@@ -5,17 +5,18 @@ import {
   UPDATE_TODO,
   SET_GROUP,
   SET_TAB,
+  SET_SORT_BY,
 } from '../ActionTypes';
 import TodoData from '../_data';
 
 const initialState = {
   loading: false,
-
   todoList: [...TodoData],
   group: 'none',
   groupData: {},
   tab: 0,
-  tabData: [...TodoData],
+  order: 1,
+  sortBy: 'created',
 };
 
 export default (state = initialState, action) => {
@@ -67,21 +68,27 @@ export default (state = initialState, action) => {
       };
     }
     case SET_TAB: {
-      let data = [];
-      if (action.payload === 0) {
-        data = [...state.todoList];
-      } else if (action.payload === 1) {
-        data = state.todoList.filter((todo) => !todo.completed);
-      } else if (action.payload === 2) {
-        data = state.todoList.filter((todo) => todo.completed);
-      }
-
       return {
         ...state,
         tab: action.payload,
-        tabData: data,
         loading: false,
       };
+    }
+    case SET_SORT_BY: {
+      if (action.payload === state.sortBy) {
+        return {
+          ...state,
+          order: -1 * state.order,
+          loading: false,
+        };
+      } else {
+        return {
+          ...state,
+          order: 1,
+          sortBy: action.payload,
+          loading: false,
+        };
+      }
     }
     default: {
       return state;

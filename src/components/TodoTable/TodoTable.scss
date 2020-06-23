@@ -1,16 +1,7 @@
 .table {
-    display: grid;
-    background-color: red($color: #000000);
-    grid-template-columns: 4fr 2fr 2fr 2fr 2fr;
-}
-
-.tableHeader {
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.tableData {
-    background: #fff;
+  display: grid;
+  background-color: red($color: #000000);
+  grid-template-columns: 4fr 2fr 2fr 2fr 3fr;
 }
 
 .summary,
@@ -18,5 +9,20 @@
 .created,
 .due,
 .actions {
-    padding: 1rem;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  border: 1px solid #ddd;
+}
+
+.tableHeader {
+  background: #fff;
+  border-radius: 5px;
+  box-shadow: 4px 4px 10px #bbb;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+
+.tableHeader > div {
+  justify-content: space-between;
 }

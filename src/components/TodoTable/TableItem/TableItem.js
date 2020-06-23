@@ -1,9 +1,15 @@
-import React, { useState, useCallback } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState, useCallback } from 'react';
+import { useDispatch } from 'react-redux';
+import Button from '@material-ui/core/Button';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import moment from 'moment';
 
-import { removeTodo, updateTodo } from "../../../store/Actions/TodoAction";
+import Modal from '../../../components/Modal/Modal';
+import { removeTodo, updateTodo } from '../../../store/Actions/TodoAction';
+import './TableItem.scss';
 
-const TodoTable = ({ todo }) => {
+const TodoTable = ({ todo, openModal }) => {
   const [todoState, setTodoState] = useState({ ...todo });
 
   const dispatch = useDispatch(todoState);
@@ -24,31 +30,65 @@ const TodoTable = ({ todo }) => {
   };
 
   let style = todoState.completed
-    ? { textDecoration: "line-through" }
-    : { textDecoration: "none" };
+    ? { textDecoration: 'line-through' }
+    : { textDecoration: 'none' };
+
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="table tableData">
-      <div className="summary" style={style}>
+    <div className='table tableData'>
+      {open && <Modal open={open} setOpen={setOpen} data={todo} />}
+      <div className='summary' style={style}>
         {todoState.summary}
       </div>
-      <div className="priority" style={style}>
+      <div className='priority' style={style}>
         {todoState.priority}
       </div>
-      <div className="created" style={style}>
-        {todoState.createdAt}
+      <div className='created' style={style}>
+        {moment(todoState.dueDate).format('YYYY-MM-DD')}
       </div>
-      <div className="due" style={style}>
-        {todoState.dueDate}
+      <div className='due' style={style}>
+        {moment(todoState.dueDate).format('YYYY-MM-DD')}
       </div>
-      <div className="actions">
-        <button>Edit</button>
+      <div className='actions'>
+        <Button
+          variant='contained'
+          size='small'
+          color='primary'
+          onClick={() => setOpen(true)}
+        >
+          <EditIcon />
+        </Button>
         {todoState.completed ? (
-          <button onClick={completeTodoHandler}>Re-Open</button>
+          <Button
+            variant='outlined'
+            size='small'
+            color='primary'
+            style={{ background: 'teal', color: '#fff', margin: '0 0.5rem' }}
+            onClick={completeTodoHandler}
+          >
+            Re-Open
+          </Button>
         ) : (
-          <button onClick={completeTodoHandler}>Done</button>
+          <Button
+            variant='outlined'
+            size='small'
+            color='primary'
+            style={{ background: 'green', color: '#fff', margin: '0 0.5rem' }}
+            onClick={completeTodoHandler}
+          >
+            Done
+          </Button>
         )}
-        <button onClick={removeTodoHandler}>Delete</button>
+        <Button
+          variant='outlined'
+          size='small'
+          color='primary'
+          style={{ background: 'red', color: '#fff', margin: '0 0.5rem' }}
+          onClick={removeTodoHandler}
+        >
+          <DeleteOutlineIcon />
+        </Button>
       </div>
     </div>
   );
