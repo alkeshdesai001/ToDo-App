@@ -1,0 +1,22 @@
+.table {
+    display: grid;
+    background-color: red($color: #000000);
+    grid-template-columns: 4fr 2fr 2fr 2fr 2fr;
+}
+
+.tableHeader {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.tableData {
+    background: #fff;
+}
+
+.summary,
+.priority,
+.created,
+.due,
+.actions {
+    padding: 1rem;
+}
