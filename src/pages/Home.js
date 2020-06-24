@@ -33,7 +33,7 @@ const Home = () => {
         <div className='tabs'>
           <Tabs tabs={tabs} tab={tab} setTab={setTabType} />
         </div>
-        <div className='border'>
+        <div className='border' style={{ margin: '0 0 10rem 0' }}>
           <TodoTable />
         </div>
       </Container>

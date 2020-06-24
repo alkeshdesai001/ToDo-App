@@ -6,6 +6,7 @@ import {
   SET_GROUP,
   SET_TAB,
   SET_SORT_BY,
+  SEARCH_TODO,
 } from '../ActionTypes.js';
 
 export const setLoading = () => ({ type: SET_LOADING });
@@ -37,5 +38,10 @@ export const setTab = (payload) => ({
 
 export const setSortBy = (payload) => ({
   type: SET_SORT_BY,
+  payload,
+});
+
+export const searchTodo = (payload) => ({
+  type: SEARCH_TODO,
   payload,
 });

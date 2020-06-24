@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Transition, TransitionGroup } from 'react-transition-group';
+import moment from 'moment';
 import Button from '@material-ui/core/Button';
 import SortRoundedIcon from '@material-ui/icons/SortRounded';
 
@@ -23,9 +24,15 @@ const transitionStyles = {
 };
 
 const TodoTable = ({ openModal }) => {
-  const { tab, group, todoList, order, sortBy } = useSelector(
-    (state) => state.todo
-  );
+  const {
+    tab,
+    group,
+    todoList,
+    order,
+    sortBy,
+    filter,
+    filteredTodo,
+  } = useSelector((state) => state.todo);
 
   const dispatch = useDispatch();
 
@@ -42,22 +49,29 @@ const TodoTable = ({ openModal }) => {
   };
 
   useEffect(() => {
-    if (tab === 0) {
-      setTabTodo([...todoList]);
-    } else if (tab === 1) {
-      setTabTodo(todoList.filter((todo) => !todo.completed));
-    } else if (tab === 2) {
-      setTabTodo(todoList.filter((todo) => todo.completed));
+    let list;
+    if (filter === '') {
+      list = [...todoList.reverse()];
+    } else {
+      list = [...filteredTodo.reverse()];
     }
-  }, [tab, todoList]);
+
+    if (tab === 0) {
+      setTabTodo([...list]);
+    } else if (tab === 1) {
+      setTabTodo(list.filter((todo) => !todo.completed));
+    } else if (tab === 2) {
+      setTabTodo(list.filter((todo) => todo.completed));
+    }
+  }, [tab, todoList, filter, filteredTodo]);
 
   useEffect(() => {
     const priority = (level) => {
       let lev;
-      if (level === 'HIGH') lev = 3 * order;
-      else if (level === 'MEDIUM') lev = 2 * order;
-      else if (level === 'LOW') lev = 1 * order;
-      else if (level === 'NONE') lev = 0 * order;
+      if (level === 'HIGH') lev = 3;
+      else if (level === 'MEDIUM') lev = 2;
+      else if (level === 'LOW') lev = 1;
+      else if (level === 'NONE') lev = 0;
       return lev;
     };
     if (sortBy === 'priority') {
@@ -71,18 +85,29 @@ const TodoTable = ({ openModal }) => {
         return levelA < levelB ? -1 : levelA > levelB ? 1 : 0;
       });
       setSortedTodo([...sortedList]);
-    } else if (sortBy === 'created') {
-      setSortedTodo([...tabTodo]);
-    } else {
+    } else if (sortBy === 'createdAt' || sortBy === 'dueDate') {
       let sortedList = tabTodo.sort((a, b) => {
-        let textA = a.priority.toUpperCase();
-        let textB = b.priority.toUpperCase();
+        let textA = moment(a[sortBy]).format('x');
+        let textB = moment(b[sortBy]).format('x');
         return textA - textB;
       });
-      let decList = sortedList.reverse();
-      setSortedTodo([...decList]);
+      setSortedTodo([...sortedList]);
+    } else if (sortBy === 'summary') {
+      let sortedList = tabTodo.sort((a, b) => {
+        if (a[sortBy].toLowerCase() < b[sortBy].toLowerCase()) return -1;
+        if (a[sortBy].toLowerCase() > b[sortBy].toLowerCase()) return 1;
+        return 0;
+      });
+      setSortedTodo([...sortedList]);
+    } else {
+      setSortedTodo([...tabTodo]);
     }
-  }, [tabTodo, sortBy, order]);
+  }, [tabTodo, sortBy]);
+
+  useEffect(() => {
+    setSortedTodo([...sortedTodo.reverse()]);
+    // eslint-disable-next-line
+  }, [order]);
 
   useEffect(() => {
     let groupObj = sortedTodo.reduce((r, todo) => {
@@ -90,6 +115,7 @@ const TodoTable = ({ openModal }) => {
       return r;
     }, {});
     setGroupedTodo({ ...groupObj });
+    // eslint-disable-next-line
   }, [sortedTodo, group]);
 
   let groupKeys = Object.keys(groupedTodo);
@@ -126,7 +152,7 @@ const TodoTable = ({ openModal }) => {
             variant='contained'
             size='small'
             color='primary'
-            onClick={() => sortHeaderHandler('created')}
+            onClick={() => sortHeaderHandler('createdAt')}
           >
             <SortRoundedIcon />
           </Button>
@@ -137,7 +163,7 @@ const TodoTable = ({ openModal }) => {
             variant='contained'
             size='small'
             color='primary'
-            onClick={() => sortHeaderHandler('due')}
+            onClick={() => sortHeaderHandler('dueDate')}
           >
             <SortRoundedIcon />
           </Button>

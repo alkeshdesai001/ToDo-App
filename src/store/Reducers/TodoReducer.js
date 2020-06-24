@@ -6,6 +6,7 @@ import {
   SET_GROUP,
   SET_TAB,
   SET_SORT_BY,
+  SEARCH_TODO,
 } from '../ActionTypes';
 import TodoData from '../_data';
 
@@ -15,23 +16,21 @@ let initialState = {
   group: 'none',
   tab: 0,
   order: 1,
-  sortBy: 'created',
+  sortBy: 'createdAt',
+  filter: '',
+  filteredTodo: [],
 };
 
 if (localStorage.getItem('todo')) {
-  initialState = JSON.parse(localStorage.getItem('todo'));
+  initialState = {
+    ...initialState,
+    todoList: JSON.parse(localStorage.getItem('todo')).todoList,
+  };
 }
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case SET_LOADING: {
-      localStorage.setItem(
-        'todo',
-        JSON.stringify({
-          ...state,
-          loading: true,
-        })
-      );
       return {
         ...state,
         loading: true,
@@ -41,9 +40,7 @@ export default (state = initialState, action) => {
       localStorage.setItem(
         'todo',
         JSON.stringify({
-          ...state,
           todoList: [...state.todoList, action.payload],
-          loading: false,
         })
       );
       return {
@@ -60,9 +57,7 @@ export default (state = initialState, action) => {
       localStorage.setItem(
         'todo',
         JSON.stringify({
-          ...state,
           todoList: updatedTodoList,
-          loading: false,
         })
       );
       return {
@@ -79,9 +74,7 @@ export default (state = initialState, action) => {
       localStorage.setItem(
         'todo',
         JSON.stringify({
-          ...state,
           todoList: newList,
-          loading: false,
         })
       );
       return {
@@ -91,29 +84,14 @@ export default (state = initialState, action) => {
       };
     }
     case SET_GROUP: {
-      localStorage.setItem(
-        'todo',
-        JSON.stringify({
-          ...state,
-          group: action.payload,
-          loading: false,
-        })
-      );
       return {
         ...state,
         group: action.payload,
+        sortBy: action.payload,
         loading: false,
       };
     }
     case SET_TAB: {
-      localStorage.setItem(
-        'todo',
-        JSON.stringify({
-          ...state,
-          tab: action.payload,
-          loading: false,
-        })
-      );
       return {
         ...state,
         tab: action.payload,
@@ -122,29 +100,12 @@ export default (state = initialState, action) => {
     }
     case SET_SORT_BY: {
       if (action.payload === state.sortBy) {
-        localStorage.setItem(
-          'todo',
-          JSON.stringify({
-            ...state,
-            order: -1 * state.order,
-            loading: false,
-          })
-        );
         return {
           ...state,
           order: -1 * state.order,
           loading: false,
         };
       } else {
-        localStorage.setItem(
-          'todo',
-          JSON.stringify({
-            ...state,
-            order: 1,
-            sortBy: action.payload,
-            loading: false,
-          })
-        );
         return {
           ...state,
           order: 1,
@@ -152,6 +113,20 @@ export default (state = initialState, action) => {
           loading: false,
         };
       }
+    }
+    case SEARCH_TODO: {
+      let filteredTodo = [];
+      if (action.payload.trim() !== '') {
+        filteredTodo = state.todoList.filter((todo) => {
+          const regex = new RegExp(`${action.payload}`, 'gi');
+          return todo.summary.match(regex) || todo.description.match(regex);
+        });
+      }
+      return {
+        ...state,
+        filter: action.payload,
+        filteredTodo,
+      };
     }
     default: {
       return state;

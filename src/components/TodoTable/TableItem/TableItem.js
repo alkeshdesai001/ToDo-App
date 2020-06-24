@@ -9,7 +9,7 @@ import Modal from '../../../components/Modal/Modal';
 import { removeTodo, updateTodo } from '../../../store/Actions/TodoAction';
 import './TableItem.scss';
 
-const TodoTable = ({ todo, openModal }) => {
+const TodoTable = ({ todo }) => {
   const [todoState, setTodoState] = useState({});
 
   useEffect(() => {
@@ -18,26 +18,27 @@ const TodoTable = ({ todo, openModal }) => {
 
   const dispatch = useDispatch();
 
+  const completeTodoHandler = () => {
+    let stateObj = { ...todoState, completed: !todoState.completed };
+    updateTodoHandler(stateObj);
+  };
+
   const updateTodoHandler = useCallback(
     (stateObj) => dispatch(updateTodo(stateObj)),
     [dispatch]
   );
+
   const removeTodoHandler = useCallback(
     () => dispatch(removeTodo(todoState.id)),
     [dispatch, todoState.id]
   );
-
-  const completeTodoHandler = () => {
-    let stateObj = { ...todoState, completed: !todoState.completed };
-    setTodoState(stateObj);
-    updateTodoHandler(stateObj);
-  };
 
   let style = todoState.completed
     ? { textDecoration: 'line-through' }
     : { textDecoration: 'none' };
 
   const [open, setOpen] = useState(false);
+  const [mode, setMode] = useState('readOnly');
 
   const priorityList = (value) => {
     switch (value) {
@@ -54,6 +55,21 @@ const TodoTable = ({ todo, openModal }) => {
     }
   };
 
+  const readOnlyHandler = () => {
+    setMode('readOnly');
+    setOpen(true);
+  };
+
+  const editHandler = () => {
+    setMode('edit');
+    setOpen(true);
+  };
+
+  const deleteHandler = () => {
+    setMode('delete');
+    setOpen(true);
+  };
+
   return (
     <div className='table tableData'>
       {open && (
@@ -61,20 +77,21 @@ const TodoTable = ({ todo, openModal }) => {
           open={open}
           setOpen={setOpen}
           data={todo}
-          mode='edit'
+          mode={mode}
           updateTodoHandler={updateTodoHandler}
+          removeTodoHandler={removeTodoHandler}
         />
       )}
-      <div className='summary' style={style}>
+      <div className='summary' style={style} onClick={readOnlyHandler}>
         {todoState.summary}
       </div>
-      <div className='priority' style={style}>
+      <div className='priority' style={style} onClick={readOnlyHandler}>
         {priorityList(todoState.priority)}
       </div>
-      <div className='created' style={style}>
+      <div className='created' style={style} onClick={readOnlyHandler}>
         {moment(todoState.created).format('YYYY-MM-DD')}
       </div>
-      <div className='due' style={style}>
+      <div className='due' style={style} onClick={readOnlyHandler}>
         {moment(todoState.dueDate).format('YYYY-MM-DD')}
       </div>
       <div className='actions'>
@@ -82,7 +99,7 @@ const TodoTable = ({ todo, openModal }) => {
           variant='contained'
           size='small'
           color='primary'
-          onClick={() => setOpen(true)}
+          onClick={editHandler}
         >
           <EditIcon />
         </Button>
@@ -112,7 +129,7 @@ const TodoTable = ({ todo, openModal }) => {
           size='small'
           color='primary'
           style={{ background: 'red', color: '#fff', margin: '0 0.5rem' }}
-          onClick={removeTodoHandler}
+          onClick={deleteHandler}
         >
           <DeleteOutlineIcon />
         </Button>

@@ -5,3 +5,4 @@ export const UPDATE_TODO = 'UPDATE_TODO';
 export const SET_GROUP = 'SET_GROUP';
 export const SET_TAB = 'SET_TAB';
 export const SET_SORT_BY = 'SET_SORT_BY';
+export const SEARCH_TODO = 'SEARCH_TODO';
